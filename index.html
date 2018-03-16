@@ -1,0 +1,121 @@
+<html> 
+
+<head>
+	<title>Jquery WebCam</title>
+	<script src="js/jquery-1.12.0.js"></script>
+	<script src="js/timer.jquery.min.js"></script>
+	
+	<meta charset="utf-8">
+	
+	<script>		
+		function openWindow() {
+			window.open("camera.html", "", "width=1050, height=400");
+		}
+		
+		function CapturarDigital() {
+			$.ajax({
+				method: "GET",
+				url: "localhost:8080/digital/capturar?cpf=85597708872",
+				success: function(data) {
+					var json = $.parseJSON(data);
+					$('#ServicoCapturaDigital').html(json);
+				},
+				error: function(ex, textStatus, errorThrown) {
+					var json = $.parseJSON(ex);
+					$('#ServicoCapturaDigital').html(json);
+				} 
+			});
+		}
+		
+		function IniciarProva() {
+			$.ajax({
+				method: "GET",
+				url: "localhost:8080/filmagem/iniciar?cpf=85597708872",
+				success: function(data) {
+					var json = $.parseJSON(data);
+					$('#ServicoIniciaProva').html(json);
+					
+					$('#timerProva').timer({
+						format: '%H:%M:%S',
+						duration: '60s',
+						callback: function() {
+							MonitoracaoProva();
+						},
+						repeat: true
+					});
+				},
+				error: function(ex, textStatus, errorThrown) {
+					var json = $.parseJSON(ex);
+					$('#ServicoIniciaProva').html(json);
+				} 
+			});
+		}
+		
+		function TerminarProva() {
+			$.ajax({
+				method: "GET",
+				url: "localhost:8080/filmagem/terminar?cpf=85597708872",
+				success: function(data) {
+					var json = $.parseJSON(data);
+					$('#ServicoTerminoProva').html(json);
+					$('#timerProva').timer('remove');
+				},
+				error: function(ex, textStatus, errorThrown) {
+					var json = $.parseJSON(ex);
+					$('#ServicoTerminoProva').html(json);
+				} 
+			});
+		}
+		
+		function MonitoracaoProva() {
+			$.ajax({
+				method: "GET",
+				url: "localhost:8080/filmagem/monitorar?cpf=85597708872",
+				success: function(data) {
+					var json = $.parseJSON(data);
+					$('#ServicoMonitoracaoProva').html(json);
+				},
+				error: function(ex, textStatus, errorThrown) {
+					var json = $.parseJSON(ex);
+					$('#ServicoMonitoracaoProva').html(json);
+				} 
+			});
+		}
+	</script>
+	
+</head>
+
+<body>
+	
+	<button onclick="openWindow()"> Tirar Foto </button>
+	
+	<button onclick="CapturarDigital()"> Capturar Digital </button>
+	
+	<button onclick="IniciarProva()"> Iniciar Prova </button>
+	
+	<button onclick="TerminarProva()"> Finalizar Prova </button>
+	
+	<span id="timerProva">00:00:00</span>
+	
+	<br />
+	
+	<hr></hr>
+	
+	<span>Resultados das Requisições</span>
+	<br />
+	
+	<span>Resultado do Serviço Captura Digital:</span><span id="ServicoCapturaDigital"></span>
+	<br /><br />
+	
+	<span>Resultado do Serviço Iniciar Prova:</span><span id="ServicoIniciaProva"></span>
+	<br /><br />
+	
+	<span>Resultado do Serviço de Monitoração:</span><span id="ServicoMonitoracaoProva"></span>
+	
+	<br /><br />
+	
+	<span>Resultado do Serviço Termino Prova:</span><span id="ServicoTerminoProva"></span>
+	
+</body>
+
+</html>

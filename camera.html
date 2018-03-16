@@ -1,0 +1,110 @@
+<html> 
+
+<head>
+	<title>Jquery WebCam</title>
+	<script src="js/jquery-1.12.0.js"></script>
+		
+	<script>		
+		window.addEventListener("DOMContentLoaded", function() {
+			// Grab elements, create settings, etc.
+			var canvas = document.getElementById("canvas"),
+				context = canvas.getContext("2d"),
+				video = document.getElementById("video"),
+				videoObj = { "video": true },
+				errBack = function(error) {
+					console.log("Video capture error: ", error.code); 
+				};
+
+			// Put video listeners into place
+			if(navigator.getUserMedia) { // Standard
+				navigator.getUserMedia(videoObj, function(stream) {
+					video.src = stream;
+					video.play();
+				}, errBack);
+			} 
+			else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
+				navigator.webkitGetUserMedia(videoObj, function(stream){
+					video.src = window.webkitURL.createObjectURL(stream);
+					video.play();
+				}, errBack);
+			}
+			else if(navigator.mozGetUserMedia) { // Firefox-prefixed
+				navigator.mozGetUserMedia(videoObj, function(stream){
+					video.src = window.URL.createObjectURL(stream);
+					video.play();
+				}, errBack);
+			}
+			
+			document.getElementById("snap").addEventListener("click", function() {
+				context.drawImage(video, 0, 0, 640, 480);
+				$('#send').css('display', 'block');
+			});
+		});
+		
+		function enviarFoto() {
+			var img = document.getElementById("canvas");
+			var dataURL = img.toDataURL("image/jpeg", 0.5);
+			var aux = dataURL.split(',');
+			var auxTipoImg = aux[0].split(';');
+			auxTipoImg = auxTipoImg[0].split('/');
+			
+			var tipoImg = auxTipoImg[1];
+			var dataImagem = aux[1].split(';');
+			
+			//alert(tipoImg);
+			//alert(dataImagem);
+			
+			$.ajax({
+				method: "POST",
+				url: "",
+				data: "",
+				success: function(data) {
+					window.close();
+				},
+				error: function(ex, textStatus, errorThrown) {
+					window.close();
+					alert('Erro: ' + ex + ' -- ' + textStatus + ' -- ' + errorThrown);
+				} 
+			});
+		}
+	</script>
+	
+	<style>
+		.video {
+			width: 400px;
+			height: 300px;
+		}
+		
+		.snap {
+			top: 120px;
+			position: absolute;
+			margin-left: 20px;
+		}
+		
+		.canvas {
+			width: 400px;
+			height: 300px;
+			margin-left: 130px;
+		}
+		
+		.send {
+			display: none;
+			top: 120px;
+			position: absolute;
+			margin-left: 90%;
+		}
+	</style>
+	
+</head>
+
+<body>
+	<video id="video" class="video"></video>
+	
+	<button id="snap" class="snap">Tirar a Foto</button>
+	
+	<canvas id="canvas" class="canvas" width="640" height="480"></canvas>
+	
+	<button id="send" class="send" onclick="enviarFoto()">Enviar Foto</button>
+</body>
+
+</html>
